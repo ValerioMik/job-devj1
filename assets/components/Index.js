@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Rating, Spinner } from 'flowbite-react';
+import { Button, Rating, Spinner,Dropdown } from 'flowbite-react';
 
 const Index = props => {
     const [movies, setMovies] = useState([]);
     const [loading, setLoading] = useState(true);
+    const[genres,setGenres]=useState([]);
 
     const fetchMovies = () => {
         setLoading(true);
@@ -16,14 +17,26 @@ const Index = props => {
             });
     }
 
+    const fetchGenres = () => {
+      setLoading(true);
+
+      return fetch('/api/genres')
+          .then(response => response.json())
+          .then(data => {
+              setGenres(data.genres);
+              setLoading(false);
+          });
+  }
+
+  
     useEffect(() => {
         fetchMovies();
+        fetchGenres();
     }, []);
 
     return (
         <Layout>
           <Heading />
-
           <MovieList loading={loading}>
             {movies.map((item, key) => (
               <MovieItem key={key} {...item} />
@@ -47,7 +60,7 @@ const Heading = props => {
     return (
         <div className="mx-auto max-w-screen-sm text-center mb-8 lg:mb-16">
           <h1 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">
-            Movie Collection
+            Movie Collection234
           </h1>
 
           <p className="font-light text-gray-500 lg:mb-16 sm:text-xl dark:text-gray-400">
@@ -94,7 +107,7 @@ const MovieItem = props => {
                     {props.rating
                       ? <Rating>
                           <Rating.Star />
-
+                        	  
                           <span className="ml-0.5">
                             {props.rating}
                           </span>
@@ -129,5 +142,22 @@ const MovieItem = props => {
         </div>
     );
 };
+
+
+const FilterMovie = props => {
+  return (
+    <Dropdown label="Genres" placement="left-start" dismissOnClick={false}>
+      {props.genres.map((genre) => (
+        <Dropdown.Item>
+          <span color="gray" key={genre.id} onClick={() => props.onFilterByGenre(genre.id)}>
+            {genre.value}
+          </span>
+        </Dropdown.Item>
+      ))}
+    </Dropdown>
+  )
+}
+
+
 
 export default Index;
